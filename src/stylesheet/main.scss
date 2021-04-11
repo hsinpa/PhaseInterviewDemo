@@ -1,0 +1,20 @@
+body {
+    height: 100%;
+    width: 100%;
+    background-color: #ebf0f3;
+    margin: 0px;
+    padding: 0px;
+}
+
+.control_panel {
+    position: absolute;
+    top: 3rem;
+    left: 3rem;
+    z-index: 2;
+}
+
+.control_bar {
+    position: fixed;
+    top : 1rem;
+    left : 1rem;
+}

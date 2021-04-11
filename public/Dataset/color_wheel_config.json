@@ -1,0 +1,59 @@
+{
+    "canvas_query" : "#webgl_canvas",
+    "vertex_path" : "./glsl/simple_webgl.vert",
+    "frag_path" : "./glsl/color_wheel.frag",
+    "canvas_height" : 600,
+    "canvas_width" : 850,
+    "colorWheel" : {
+        "x" : 150,
+        "y" : 450,
+        "radius" : 100
+    },
+
+    "polygons" : [
+        {
+        "id" : "box_01",
+        "color" : [1, 0, 0,1],
+        "x" : 550,
+        "y" : 350,
+        "scale" :70,
+        "points" : [[-1, -1], [-1, 1], [1, -1],
+                    [1, -1], [-1, 1], [1, 1]]   
+    },
+
+    {
+        "id" : "triangle_01",
+        "color" : [1, 0.3, 0.3, 1],
+        "x" : 480,
+        "y" : 500,
+        "scale" : 50,
+        "points" : [[-1, -1], [-1, 1], [1, -0.5]]
+    },
+    {
+        "id" : "fake_sphere",
+        "color" : [0, 0, 1,1],
+        "x" : 430,
+        "y" : 320,
+        "scale" : 60,
+        "points" : [[0,0], [0.30901699437494745, 0.9510565162951535], [1, 0]]
+    },
+    {
+        "id" : "rectangle_01",
+        "color" : [0, 0.5, 1,1],
+        "x" : 390,
+        "y" : 420,
+        "scale" : 70,
+        "points" : [[-1, -0.6], [-1, 0.6], [1, -0.6],
+                    [1, -0.6], [-1, 0.6], [1, 0.6]]
+    },
+    {
+        "id" : "background",
+        "color" : [1,1,1,1],
+        "x" : 300,
+        "y" : 300,
+        "scale" : 1000,
+        "points" : [[-1, -1], [-1, 1], [1, -1],
+                    [1, -1], [-1, 1], [1, 1]]   
+    }
+]
+}
