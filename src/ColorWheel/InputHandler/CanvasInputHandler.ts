@@ -9,6 +9,8 @@ class InputHandler {
     private _isMouseDown : boolean;
     private _startMousePosition : IntVector2;
     private _dragRange : number = 5;
+    private _delayEvent : number = 10; // 1000 = 1s
+    private _lastEventTime : number = 0;
 
     constructor(webglCanvas: HTMLCanvasElement) {
         this._webglCanvas = webglCanvas;
@@ -26,10 +28,16 @@ class InputHandler {
     }
 
     private OnMouseMove(e : MouseEvent) {
+        
         if (!this._isMouseDown) return;
 
+        if (e.timeStamp < this._lastEventTime) return;
+
         let mousePos = this.GetMousePosVector(e);
+
         this._webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.MouseDragEvent,  { detail: mousePos }))
+
+        this._lastEventTime = e.timeStamp + this._delayEvent;
     }
 
     private OnMouseUp(e : MouseEvent) {

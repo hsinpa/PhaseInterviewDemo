@@ -7,6 +7,8 @@ export interface CustomReglPropType {
     color : number[][];
     uv : number[][];
     vertexCount : number,
+    enableBorder : number,
+    shapeType : number,
     scale : number
 }
 
@@ -20,6 +22,8 @@ export function ExecuteREGLCommand(regl : Regl, drawCommand : REGL.DrawCommand, 
         vertex : regl.buffer(vertexAttrType.position),
         color : regl.buffer(vertexAttrType.color),
         uv : regl.buffer(vertexAttrType.uv),
+        enableBorder : (vertexAttrType.enableBorder) ? 1 : 0,
+        shapeType : vertexAttrType.type,
         vertexCount : vertexAttrType.count
     });
 }
@@ -52,6 +56,8 @@ export function CreateREGLCommandObj(regl : Regl, vertex : string, fragment : st
 
         uniforms: {
             time: regl.prop<CustomReglPropType, "time">("time"),
+            u_enableBorder: regl.prop<CustomReglPropType, "enableBorder">("enableBorder"),
+            u_shapeType: regl.prop<CustomReglPropType, "shapeType">("shapeType"),
         },
 
         count: regl.prop<CustomReglPropType, "vertexCount">("vertexCount")

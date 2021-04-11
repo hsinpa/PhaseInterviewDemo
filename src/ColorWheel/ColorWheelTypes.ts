@@ -20,6 +20,7 @@ export interface PolygonType {
     x : number;
     y : number;
     scale : number;
+    ignoreRaycast : boolean,
     color : number[];
     points : number[][];
 }
@@ -28,6 +29,8 @@ export interface VertexAttributeType {
     position : number[][]; // Vector2
     color :  number[][]; // Vector4,
     uv :  number[][]; // Vector2
+    enableBorder : boolean,
+    type : number, // ShapeType
     count : number
 }
 
@@ -52,4 +55,9 @@ export let CustomIDString = {
 
 export let DotConfig = {
     DefaultColor : [0.9,0.9,0.9, 1]
+}
+
+export let ShapeType = {
+    Sphere : 0.0,
+    Polygon : 1.0
 }

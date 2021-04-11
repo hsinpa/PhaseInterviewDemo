@@ -4,7 +4,7 @@ import {SphereCollide, hsv2rgb, TriangleCollide} from '../../Hsinpa/WebGL/WebglS
 import ColorWheel from '../ColorWheel';
 import {VectorToArray, VectorMinus, NormalizeByRange, VectorMaginitude, Lerp } from '../../Hsinpa/UtilityMethod';
 import { IntVector2 } from '../../Hsinpa/UniversalType';
-import { CustomEventTypes, CustomIDString, DotConfig, HSVType } from '../ColorWheelTypes';
+import { CustomEventTypes, CustomIDString, DotConfig, HSVType, ShapeType } from '../ColorWheelTypes';
 import WheelProcessorHelper from './WheelProcessorHelper';
 import DotProcessor from './DotProcessor';
 
@@ -70,6 +70,8 @@ class ColorWheelProcessor {
                     position : [],
                     color : [],
                     uv : [],
+                    type : ShapeType.Sphere,
+                    enableBorder : false,
                     count : 0
             }
         }
@@ -136,6 +138,8 @@ class ColorWheelProcessor {
             ],
             color : [blackCol, lightCol, blackCol, blackCol, lightCol, lightCol],
             uv : [],
+            type : ShapeType.Sphere,
+            enableBorder : false,
             count : 6
         }
 

@@ -4,7 +4,7 @@ import {SphereCollide, hsv2rgb} from '../../Hsinpa/WebGL/WebglStatic';
 import ColorWheel from '../ColorWheel';
 import {VectorToArray, VectorNumScale} from '../../Hsinpa/UtilityMethod';
 import { IntVector2 } from '../../Hsinpa/UniversalType';
-import { CustomEventTypes } from '../ColorWheelTypes';
+import { CustomEventTypes, ShapeType } from '../ColorWheelTypes';
 import WheelProcessorHelper from './WheelProcessorHelper';
 import {PiePieceType} from './ColorWheelProcessor';
 
@@ -22,7 +22,7 @@ class DotProcessor {
 
     private _dotArray : DotType[]; 
     private _wheelProcessorHelper : WheelProcessorHelper;
-    private _sphereSteps = 12; // dot is small, so keep this number small
+    private _sphereSteps = 6; // dot is small, so keep this number small
     private _cacheColor : number[]; // Current for the last update dot, do not use it directly
 
     constructor(wheelProcessorHelper : WheelProcessorHelper ) {
@@ -36,9 +36,6 @@ class DotProcessor {
         let idIndex = this._dotArray.findIndex(x=>x._id == id);
         this._cacheColor = color;
 
-
-
-
         if (idIndex >= 0) {
             this.UpdateDot(id, x, y, color);
         } else {
@@ -47,6 +44,8 @@ class DotProcessor {
                     position : [],
                     color : [],
                     uv : [],
+                    enableBorder : true,
+                    type : ShapeType.Sphere,
                     count : 0
             }
             

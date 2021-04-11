@@ -35,9 +35,7 @@ abstract class WebglCanvas {
 
         return regl.default({
             canvas : webglDom,
-
-            
-            attributes : {preserveDrawingBuffer : true}
+            //attributes : {preserveDrawingBuffer : true}
         });
     }
 

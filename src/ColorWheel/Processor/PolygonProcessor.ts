@@ -1,5 +1,5 @@
 import {PolygonType} from '../ColorWheelTypes';
-import {VertexAttributeType} from '../ColorWheelTypes';
+import {VertexAttributeType, ShapeType} from '../ColorWheelTypes';
 import ColorWheel from '../ColorWheel';
 import {VectorToArray, VectorNumScale} from '../../Hsinpa/UtilityMethod';
 import { IntVector2 } from '../../Hsinpa/UniversalType';
@@ -26,6 +26,8 @@ class PolygonProcessor {
             position : [],
             color : [],
             uv : [],
+            enableBorder : false,
+            type : ShapeType.Polygon,
             count : 0
         }
 
