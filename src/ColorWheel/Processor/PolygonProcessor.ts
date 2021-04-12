@@ -1,11 +1,15 @@
 import {PolygonType} from '../ColorWheelTypes';
-import {VertexAttributeType, ShapeType} from '../ColorWheelTypes';
+import {VertexAttributeType, ShapeType, CustomEventTypes} from '../ColorWheelTypes';
 import ColorWheel from '../ColorWheel';
 import {VectorToArray, VectorNumScale} from '../../Hsinpa/UtilityMethod';
 import { IntVector2 } from '../../Hsinpa/UniversalType';
+import {TriangleCollide} from '../../Hsinpa/WebGL/WebglStatic';
+import {Dictionary} from 'typescript-collections';
 
 class PolygonProcessor {
     private rawPolygons : PolygonType[];
+    private cachePolygonLookupTable : Dictionary<string, VertexAttributeType>;
+
     private index : number = 0;
     private count : number = 0;
     private colorWheel : ColorWheel;
@@ -16,6 +20,8 @@ class PolygonProcessor {
         this.webglCanvas = webglCanvas;
         this.rawPolygons = polygons;
         this.count = this.rawPolygons.length;
+        this.cachePolygonLookupTable = new Dictionary<string, VertexAttributeType>();
+        this.webglCanvas.addEventListener(CustomEventTypes.MouseDownEvent, this.OnMouseClick.bind(this));
     }
 
     //Process one per time
@@ -62,5 +68,34 @@ class PolygonProcessor {
     Reset() {
         this.index = 0;
     }
+
+    private GetVertexById(id : string) {
+        let cacheVertex = this.cachePolygonLookupTable.getValue(id);
+        
+        if (cacheVertex != null && cacheVertex != undefined) {
+            return cacheVertex;
+        }
+
+        let vertexType : VertexAttributeType = {
+            position : [],
+            color : [],
+            uv : [],
+            enableBorder : false,
+            type : ShapeType.Polygon,
+            count : 0
+        }
+
+        return vertexType;
+    }
+
+    //#region Input Event
+    public OnMouseClick(e : CustomEvent) {
+        let mouse : IntVector2 = e.detail;
+
+
+    }
+
+    //#endregion
+
 }
 export default PolygonProcessor;
