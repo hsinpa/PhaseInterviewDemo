@@ -1,4 +1,4 @@
-import {PolygonType} from '../ColorWheelTypes';
+import {ColorWheelConfig, PolygonType} from '../ColorWheelTypes';
 import {VertexAttributeType, ShapeType, CustomEventTypes} from '../ColorWheelTypes';
 import ColorWheel from '../ColorWheel';
 import {VectorToArray, VectorNumScale, ArrayToVector} from '../../Hsinpa/UtilityMethod';
@@ -30,19 +30,29 @@ class PolygonProcessor {
         this.cachePolygonLookupTable = new Dictionary<string, VertexAttributeType>();
     }
 
+    FindPolygonVertexByID(poly_id : string) {
+        let cacheVertex = this.cachePolygonLookupTable.getValue(poly_id);
+        return cacheVertex;
+    }
+
     //Process one per time
     Process() : VertexAttributeType {
         let polyType = this.rawPolygons[this.index];
         this.index++;
 
         let cacheVertex = this.cachePolygonLookupTable.getValue(polyType.id);
-        
+        let enableBorder = this.selectPolygon != null && this.selectPolygon.id == polyType.id;
+
         if (cacheVertex != null) {
             cacheVertex.mainColor = polyType.color;
+
+            if (polyType.gradientColor != null && (cacheVertex.enableLinearGradient || cacheVertex.enableRadialGradient))
+                cacheVertex.subColor =  polyType.gradientColor;
+            
+            cacheVertex.enableBorder = enableBorder;
+
             return cacheVertex;
         }
-
-        let enableBorder = this.selectPolygon != null && this.selectPolygon.id == polyType.id;
 
         let vertexType = CreateVertexAttributeType(ShapeType.Polygon, enableBorder);
         
@@ -61,13 +71,18 @@ class PolygonProcessor {
 
             vertexType.position.push(VectorToArray(vertexPosition));
 
-            vertexType.vertexColor.push(polyType.color);
+            vertexType.vertexColor.push(ColorWheelConfig.WhiteColor);
 
             vertexType.uv.push(VectorToArray(uv));
         }
+
+        vertexType.mainColor = polyType.color;
+        vertexType.subColor = polyType.color;
         
         vertexType.count = polygonCount;
-                
+        
+        this.cachePolygonLookupTable.setValue(polyType.id, vertexType);
+
         return vertexType;
     }
 
@@ -99,12 +114,13 @@ class PolygonProcessor {
         this._selectedPolygon = polygon;
     }
 
-    public ChangePolygonColor(poly_id : string, color : number[]) {
+    public ChangePolygonColor(poly_id : string, color : number[], supportColor : number[]) {
         let index = this.rawPolygons.findIndex(x=>x.id == poly_id);
 
         if (index < 0) return;
 
         this.rawPolygons[index].color = color;
+        this.rawPolygons[index].gradientColor = supportColor;
     }
 
     public CheckAndExecutePolygonCollision(mouse : IntVector2) : boolean {

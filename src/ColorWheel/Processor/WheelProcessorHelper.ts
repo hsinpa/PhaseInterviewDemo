@@ -80,9 +80,12 @@ export function CreateVertexAttributeType(type : number, enableBorder : boolean)
         position : [],
         vertexColor : [],
         uv : [],
-        enableBorder : enableBorder,
-        type : type,
 
+        enableBorder : enableBorder,
+        enableRadialGradient : false,
+        enableLinearGradient : false,
+
+        type : type, 
         //Default white color
         mainColor : [1,1,1,1],
         subColor : [1,1,1,1],

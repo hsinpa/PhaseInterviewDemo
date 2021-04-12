@@ -22,6 +22,7 @@ export interface PolygonType {
     scale : number;
     ignoreRaycast : boolean,
     color : number[];
+    gradientColor : number[],
     points : number[][];
 }
 
@@ -29,7 +30,11 @@ export interface VertexAttributeType {
     position : number[][]; // Vector2
     vertexColor :  number[][]; // Vector4,
     uv :  number[][]; // Vector2
+    
     enableBorder : boolean,
+    enableLinearGradient : boolean,
+    enableRadialGradient : boolean,
+
     type : number, // ShapeType
     mainColor : number[],
     subColor : number[],
@@ -50,6 +55,7 @@ export let CustomEventTypes = {
     MouseCtrlClick : "event@clickclick",
     DeselectPolygonEvent : "event@polygonDeselect",
     OnDominateColorEvent : "event@dominateColorChange",
+    OnSupportColorEvent : "event@supportColorChange",
 }
 
 export let CustomIDString = {
@@ -60,11 +66,20 @@ export let CustomIDString = {
 
 export let ColorWheelConfig = {
     DotControlColor : [0.9,0.9,0.9, 1],
+    SubDotControlColor : [0.6,0.6,0.6, 1],
+
     WhiteColor : [1,1,1,1],
-    BlackColor : [0,0,0,1]
+    BlackColor : [0,0,0,1],
+
+    MainDotSize : 6,
+    SupportDotSize : 5,
 }
 
 export let ShapeType = {
     Sphere : 0.0,
     Polygon : 1.0
+}
+
+export enum ColorWheelMode {
+    Normal, Gradient
 }

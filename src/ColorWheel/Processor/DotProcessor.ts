@@ -32,12 +32,11 @@ class DotProcessor {
 
     constructor(mainApp : ColorWheel, wheelProcessorHelper : WheelProcessorHelper ) {
         this._mainApp = mainApp;
-        this.radius = 6;
         this._dotArray = [];
         this._wheelProcessorHelper = wheelProcessorHelper;
     }
 
-    AddDot(id : string, x : number,  y : number, center_x : number, center_y : number, color : number[]) {
+    AddDot(id : string, x : number,  y : number, center_x : number, center_y : number, color : number[], radius : number) {
         let idIndex = this._dotArray.findIndex(x=>x._id == id);
 
         if (idIndex >= 0) {
@@ -47,9 +46,9 @@ class DotProcessor {
             let offsetClipSpace = this.GetOffset(x,y,center_x,center_y);
 
             let newDotType : DotType = {
-                x : x, y : y, radius : this.radius,
+                x : x, y : y, radius : radius,
                 center_x : center_x, center_y : center_y, _id : id,
-                vertex : this._wheelProcessorHelper.GetSphereVertext(newVertex, center_x, center_y, this.radius, this._sphereSteps, this.GetDotColors.bind(this) )
+                vertex : this._wheelProcessorHelper.GetSphereVertext(newVertex, center_x, center_y, radius, this._sphereSteps, this.GetDotColors.bind(this) )
             }
 
             newDotType.vertex.mainColor = color;
@@ -100,6 +99,17 @@ class DotProcessor {
         let centerClipSpace = this._mainApp.ScreenPositionToClipSpace(centerX , centerY);
         return VectorMinus(dotClipSpace, centerClipSpace);
     }
+
+    public CheckDotCollision(dotID : string, mouseX : number, mouseY : number) {
+        let idIndex = this._dotArray.findIndex(x=>x._id == dotID);
+        if (idIndex >= 0) {
+            let isCollide = SphereCollide(this._dotArray[idIndex].x, this._dotArray[idIndex].y, this._dotArray[idIndex].radius, mouseX, mouseY);
+            return isCollide;
+        }
+
+        return false;
+    }
+
 }
 
 export default DotProcessor

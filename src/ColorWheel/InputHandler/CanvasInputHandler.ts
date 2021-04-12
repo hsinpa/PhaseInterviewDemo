@@ -2,13 +2,16 @@ import { IntVector2 } from '../../Hsinpa/UniversalType';
 import { VectorDistance } from '../../Hsinpa/UtilityMethod';
 import { CustomEventTypes } from '../ColorWheelTypes';
 
+export enum InputState {
+    MouseDown, MouseDrag, MouseUp
+}
+
 class InputHandler {
     
     private _webglCanvas : HTMLCanvasElement;
 
     private _isMouseDown : boolean;
     private _startMousePosition : IntVector2;
-    private _dragRange : number = 5;
     private _delayEvent : number = 10; // 1000 = 1s
     private _lastEventTime : number = 0;
 

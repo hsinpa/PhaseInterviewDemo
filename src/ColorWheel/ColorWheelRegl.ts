@@ -12,6 +12,8 @@ export interface CustomReglPropType {
     positionOffset : number[], //Vector2
     vertexCount : number,
     enableBorder : number,
+    enableRadialGradient : number,
+    enableLinearGradient : number,
     shapeType : number,
     scale : number
 }
@@ -23,10 +25,14 @@ export function ExecuteREGLCommand(regl : Regl, drawCommand : REGL.DrawCommand, 
     // console.log("vertexAttrType.count " + vertexAttrType.count);
     
     drawCommand({
-        vertex : regl.buffer(vertexAttrType.position),
-        color : regl.buffer(vertexAttrType.vertexColor),
-        uv : regl.buffer(vertexAttrType.uv),
+        vertex : (vertexAttrType.position),
+        color : (vertexAttrType.vertexColor),
+        uv : (vertexAttrType.uv),
+
         enableBorder : (vertexAttrType.enableBorder) ? 1 : 0,
+        enableRadialGradient :  (vertexAttrType.enableRadialGradient) ? 1 : 0,
+        enableLinearGradient :  (vertexAttrType.enableLinearGradient) ? 1 : 0,
+
         shapeType : vertexAttrType.type,
         mainColor : vertexAttrType.mainColor,
         subColor : vertexAttrType.subColor,
@@ -40,21 +46,6 @@ export function CreateREGLCommandObj(regl : Regl, vertex : string, fragment : st
         frag: fragment,
         vert: vertex,
 
-        blend : {
-            enable: true,
-            func: {
-              srcRGB: 'src alpha',
-              srcAlpha: 1,
-              dstRGB: 'src alpha',
-              dstAlpha: 0
-            },
-            equation: {
-              rgb: 'add',
-              alpha: 'add'
-            },
-            color: [0, 0, 0, 0]
-        },
-
         attributes: {
             a_position: regl.prop<CustomReglPropType, "vertex">("vertex"),
             a_color: regl.prop<CustomReglPropType, "color">("color"),
@@ -66,6 +57,9 @@ export function CreateREGLCommandObj(regl : Regl, vertex : string, fragment : st
             u_offset : regl.prop<CustomReglPropType, "positionOffset">("positionOffset"),
 
             u_enableBorder: regl.prop<CustomReglPropType, "enableBorder">("enableBorder"),
+            u_enableRadialGradient: regl.prop<CustomReglPropType, "enableRadialGradient">("enableRadialGradient"),
+            u_enableLinearGradient: regl.prop<CustomReglPropType, "enableLinearGradient">("enableLinearGradient"),
+
             u_shapeType: regl.prop<CustomReglPropType, "shapeType">("shapeType"),
             u_mainColor: regl.prop<CustomReglPropType, "mainColor">("mainColor"),
             u_subColor: regl.prop<CustomReglPropType, "subColor">("subColor"),
