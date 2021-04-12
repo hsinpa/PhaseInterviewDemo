@@ -24,11 +24,13 @@ class WheelProcessorHelper {
                                         scaleY : y }
         
         //Quick reset, hope to save performance by reusing array
-        vertexType.position.length = 0
-        vertexType.color.length = 0
-        vertexType.uv.length = 0
-        vertexType.count = 0;
+        
+        let isCacheVertex = vertexType.position.length > 0;
 
+         vertexType.position.length = 0
+         vertexType.color.length = 0
+        //vertexType.uv.length = 0
+        vertexType.count = 0;
 
         for (let i = 0; i < steps; i++) {
             let s = step * i;
@@ -43,7 +45,10 @@ class WheelProcessorHelper {
             }
 
             vertexType.position = vertexType.position.concat(this.GetVertexArray(t1, t3, t2));
-            vertexType.uv = vertexType.uv.concat(this.GetUVArray(t1, t3, t2));
+            
+            if (!isCacheVertex)
+                vertexType.uv = vertexType.uv.concat(this.GetUVArray(t1, t3, t2));
+            
             vertexType.color = vertexType.color.concat(GetColorArrayFunc(t1, t3, t2));
         }
         vertexType.count = vertexType.position.length;

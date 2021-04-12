@@ -36,10 +36,11 @@ class ColorWheelProcessor {
     private radian_offset : number;
     private hsv : HSVType;
 
-    private dominateColor : number[];
     private cacheWheelVertex : VertexAttributeType;
     private cacheColorBarVertex : VertexAttributeType;
     private cacheColorBarPoints : ColorPickBarPointsType;
+
+    public dominateColor : number[];
 
     public get dotProcessor() {
         return this._dotProcessor;
@@ -54,12 +55,8 @@ class ColorWheelProcessor {
         this.webglCanvas = webglCanvas;
 
         this.dominateColor =  [1,1,1,1];
-        this.hsv = {radian : 1, saturation : 1, value : 1 }
-        this.SetValueBarNumber(1);
-        this._dotProcessor.AddDot(CustomIDString.DominateDot,colorWheelType.x, colorWheelType.y, this.dominateColor);
-
-        this.webglCanvas.addEventListener(CustomEventTypes.MouseDownEvent, this.OnMouseClick.bind(this));
-        this.webglCanvas.addEventListener(CustomEventTypes.MouseDragEvent, this.OnMouseDrag.bind(this));
+        this.hsv = {radian : 1, saturation : 0, value : 1 }
+        this.SetColorWheelByHSV(this.hsv);
     }
 
 //#region Color Wheel
@@ -98,7 +95,7 @@ class ColorWheelProcessor {
 
 //#region Value Bar
     //Assume value bar always align left
-    GetValueBarRect() : ColorPickBarPointsType {
+    private GetValueBarRect() : ColorPickBarPointsType {
         let widthRadius = 15 * 0.5, space = 10;
         let x = this.colorWheelType.x - this.colorWheelType.radius - space - (widthRadius);
         let top = this.colorWheelType.y + this.colorWheelType.radius,
@@ -160,27 +157,18 @@ class ColorWheelProcessor {
 //#endregion
 
 //#region Event Listener
-public OnMouseClick(e : CustomEvent) {
-    let mouse : IntVector2 = e.detail;
-    this.OnMouseAction(mouse);
-}
 
-public OnMouseDrag(e : CustomEvent) {
-    let mouse : IntVector2 = e.detail;
-    this.OnMouseAction(mouse);
-}
-
-private OnMouseAction(mouse : IntVector2) {
-    //If is inside color wheel
+public CheckAndExecuteColorWheelCollision(mouse : IntVector2) : boolean {
     let colorWheelClick = SphereCollide(this.colorWheelType.x, this.colorWheelType.y, this.colorWheelType.radius, mouse.x, mouse.y );
     if (colorWheelClick) {  
-        this.dotProcessor.AddDot(CustomIDString.DominateDot, mouse.x, mouse.y, DotConfig.DefaultColor);
-        this.SetRGBColorByMousePos(mouse.x, mouse.y);
-        this.colorWheel.DrawREGLCavnas();
-        return;
+        this.SetColorWheelByMousePos(mouse.x, mouse.y);
+        //this.colorWheel.DrawREGLCavnas();
     }
 
-    //If is inside pick color bar
+    return colorWheelClick;
+}
+
+public CheckAndExecuteValueBarCollision(mouse : IntVector2) : boolean {
     if (this.cacheColorBarPoints != null) {
         let trigCheck1 = TriangleCollide(mouse, this.cacheColorBarPoints.botLeft, this.cacheColorBarPoints.topLeft, this.cacheColorBarPoints.botRight );
         let trigCheck2 = TriangleCollide(mouse, this.cacheColorBarPoints.botRight, this.cacheColorBarPoints.topLeft, this.cacheColorBarPoints.topRight );
@@ -188,9 +176,12 @@ private OnMouseAction(mouse : IntVector2) {
         //Either one is true, mean on click
         if (trigCheck1 || trigCheck2) {
             this.SetValueBarNumber(NormalizeByRange(mouse.y, this.cacheColorBarPoints.botLeft.y, this.cacheColorBarPoints.topLeft.y));
-            this.colorWheel.DrawREGLCavnas();
+            this.dominateColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
+
+            return true;
         }
     }
+    return false;
 }
 
 private GetHSVByMousePos(x : number, y : number) : HSVType{
@@ -212,9 +203,23 @@ private GetHSVByMousePos(x : number, y : number) : HSVType{
 }
 
 //Assume is within color wheel
-private SetRGBColorByMousePos(x : number, y : number) {
+private SetColorWheelByMousePos(x : number, y : number) {
     this.hsv = this.GetHSVByMousePos(x, y);
+
+    this.dotProcessor.AddDot(CustomIDString.DominateDot, x, y, DotConfig.DefaultColor);
     this.dominateColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
+}
+
+SetColorWheelByHSV(hsv : HSVType) {
+    this.hsv = hsv;
+    
+    this.SetValueBarNumber(this.hsv.value);
+
+    let x = ((Math.cos(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.x, 
+        y = ((Math.sin(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.y ;
+
+    this._dotProcessor.AddDot(CustomIDString.DominateDot, x, y, 
+                            DotConfig.DefaultColor);
 }
 //#endregion
 }

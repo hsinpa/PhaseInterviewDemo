@@ -3,17 +3,25 @@ import { VectorMinus } from '../../Hsinpa/UtilityMethod';
 
 
 export function hsv2rgb(hue : number, saturate : number, value : number) {
-    
     hue = radian2degree(hue);
 
     let f= (n : any, k=(n+hue/60)%6) => value - value*saturate*Math.max( Math.min(k,4-k,1), 0);     
     return [f(5),f(3),f(1), 1];       
-  }
+}
+
+export function rgb2hsv(r : number,g : number, b : number) {
+    let v=Math.max(r,g,b), c=v-Math.min(r,g,b);
+    let h= c && ((v==r) ? (g-b)/c : ((v==g) ? 2+(b-r)/c : 4+(r-g)/c)); 
+    return [degree2radian(60*(h<0?h+6:h)), v&&c/v, v];
+}
   
 export function radian2degree(radian : number) {
     return radian * (180 / Math.PI);
 }
 
+export function degree2radian(degree : number) {
+    return degree * (Math.PI / 180);
+}
 
 //#region Collision Detection
 

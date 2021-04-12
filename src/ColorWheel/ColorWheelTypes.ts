@@ -44,7 +44,8 @@ export let CustomEventTypes = {
     MouseDownEvent : "event@mousedown",
     MouseDragEvent : "event@mouseDrag",
     MouseUpEvent : "event@mouseUp",
-    MouseCtrlClick : "event@clickclick"
+    MouseCtrlClick : "event@clickclick",
+    DeselectPolygonEvent : "event@polygonDeselect",
 }
 
 export let CustomIDString = {

@@ -62,6 +62,10 @@ export function VectorToArray(v :IntVector2 ) : number[] {
     return [v.x, v.y];
 }
 
+export function ArrayToVector(array : number[] ) : IntVector2 {    
+    return {x : array[0], y : array[1]};
+}
+
 export function Clamp(value : number, min : number, max : number) {
     return Math.min(Math.max(value, min), max);
   };

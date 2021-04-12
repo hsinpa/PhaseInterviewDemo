@@ -6,6 +6,8 @@ import {CreateREGLCommandObj, ExecuteREGLCommand} from './ColorWheelRegl';
 
 import PolygonProcessor from './Processor/PolygonProcessor';
 import ColorWheelProcessor from './Processor/ColorWheelProcessor';
+import InputProcessor from './Processor/InputProcessor';
+
 import CanvasInputHandler from './InputHandler/CanvasInputHandler';
 
 
@@ -16,13 +18,17 @@ class ColorWheel extends WebGLCanvas{
 
     polygonProcessor : PolygonProcessor;
     colorWheelProcessor : ColorWheelProcessor;
+    inputProcessor : InputProcessor;
     inputHandler : CanvasInputHandler;
 
     constructor( config: ColorWheelConfig) {
         super(config.canvas_query, config.canvas_width, config.canvas_height);
         this.webglUtility = new WebglUtility();
+        
         this.polygonProcessor = new PolygonProcessor(this, this._webglDom, config.polygons);
         this.colorWheelProcessor = new ColorWheelProcessor(this, this._webglDom,  config.colorWheel,4.0); 
+        this.inputProcessor = new InputProcessor(this, this._webglDom, this.polygonProcessor, this.colorWheelProcessor); 
+        
         this.inputHandler = new CanvasInputHandler(this._webglDom);
 
         this.InitProcess(config.vertex_path, config.frag_path);
