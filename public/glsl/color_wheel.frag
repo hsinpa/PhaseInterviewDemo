@@ -4,6 +4,9 @@
   uniform float u_enableBorder;
   uniform int u_shapeType;
 
+  uniform vec4 u_mainColor;
+  uniform vec4 u_subColor;
+
   varying vec2 v_uv;
   varying vec4 v_color;
   
@@ -18,7 +21,7 @@
 
   void main () {
 
-    vec4 returnColor = v_color;
+    vec4 returnColor = v_color * u_mainColor;
 
     if (u_enableBorder == 1.0) {
 

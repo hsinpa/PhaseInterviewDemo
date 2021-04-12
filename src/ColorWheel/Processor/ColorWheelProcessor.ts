@@ -4,8 +4,8 @@ import {SphereCollide, hsv2rgb, TriangleCollide} from '../../Hsinpa/WebGL/WebglS
 import ColorWheel from '../ColorWheel';
 import {VectorToArray, VectorMinus, NormalizeByRange, VectorMaginitude, Lerp } from '../../Hsinpa/UtilityMethod';
 import { IntVector2 } from '../../Hsinpa/UniversalType';
-import { CustomEventTypes, CustomIDString, DotConfig, HSVType, ShapeType } from '../ColorWheelTypes';
-import WheelProcessorHelper from './WheelProcessorHelper';
+import { CustomEventTypes, CustomIDString, ColorWheelConfig, HSVType, ShapeType } from '../ColorWheelTypes';
+import WheelProcessorHelper, {CreateVertexAttributeType} from './WheelProcessorHelper';
 import DotProcessor from './DotProcessor';
 
 export interface PiePieceType {
@@ -40,7 +40,20 @@ class ColorWheelProcessor {
     private cacheColorBarVertex : VertexAttributeType;
     private cacheColorBarPoints : ColorPickBarPointsType;
 
-    public dominateColor : number[];
+    private _dominateColor : number[]; // RGBA Format
+
+    public set dominateColor(color : number[]) {
+        this._dominateColor = color;
+
+        if (this.webglCanvas != null) {
+            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnDominateColorEvent,  { detail: this._dominateColor }))
+        }
+    }
+
+    public get dominateColor() {
+        return this._dominateColor;
+    }
+
 
     public get dotProcessor() {
         return this._dotProcessor;
@@ -48,7 +61,7 @@ class ColorWheelProcessor {
 
     constructor(colorWheel : ColorWheel, webglCanvas: HTMLCanvasElement, colorWheelType : ColorWheelType, radian_offset : number) {
         this.cWheelHelper = new WheelProcessorHelper(colorWheel);
-        this._dotProcessor = new DotProcessor(this.cWheelHelper);
+        this._dotProcessor = new DotProcessor(colorWheel, this.cWheelHelper);
         this.colorWheelType = colorWheelType;
         this.colorWheel = colorWheel;
         this.radian_offset = radian_offset;
@@ -62,20 +75,17 @@ class ColorWheelProcessor {
 //#region Color Wheel
     ProcessWheel(steps : number) : VertexAttributeType{
 
-        if (this.cacheWheelVertex == null) {
-            this.cacheWheelVertex = {
-                    position : [],
-                    color : [],
-                    uv : [],
-                    type : ShapeType.Sphere,
-                    enableBorder : false,
-                    count : 0
-            }
+        if (this.cacheWheelVertex != null) {
+            this.cacheWheelVertex.mainColor = [this.hsv.value, this.hsv.value, this.hsv.value, 1];
+
+            return this.cacheWheelVertex;
         }
+
+        this.cacheWheelVertex = CreateVertexAttributeType(ShapeType.Sphere, false);
 
         this.cacheWheelVertex = this.cWheelHelper.GetSphereVertext(this.cacheWheelVertex, this.colorWheelType.x, this.colorWheelType.y, 
                                                             this.colorWheelType.radius, steps, this.GetColorArray.bind(this) );
-
+        
         return this.cacheWheelVertex;
     }
 
@@ -111,12 +121,13 @@ class ColorWheelProcessor {
     }
 
     ProcessValueBar() : VertexAttributeType{
-        let lightCol = hsv2rgb(this.hsv.radian, this.hsv.saturation, 1), blackCol = [0,0,0,1];
+        let lightCol = hsv2rgb(this.hsv.radian, this.hsv.saturation, 1);
 
         //Return Cache
         if (this.cacheColorBarVertex != null) {
 
-            this.cacheColorBarVertex.color =  [blackCol, lightCol, blackCol, blackCol, lightCol, lightCol];
+            this.cacheColorBarVertex.mainColor = lightCol;
+            //this.cacheColorBarVertex.vertexColor =  [blackCol, lightCol, blackCol, blackCol, lightCol, lightCol];
 
             return this.cacheColorBarVertex;
         }
@@ -129,16 +140,13 @@ class ColorWheelProcessor {
         let botLeft : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(this.cacheColorBarPoints.botLeft.x, this.cacheColorBarPoints.botLeft.y);
         let botRight : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(this.cacheColorBarPoints.botRight.x, this.cacheColorBarPoints.botRight.y);
 
-        let vertexType : VertexAttributeType = {
-            position : [VectorToArray(botLeft), VectorToArray(topLeft), VectorToArray(botRight),
-                        VectorToArray(botRight), VectorToArray(topLeft), VectorToArray(topRight)
-            ],
-            color : [blackCol, lightCol, blackCol, blackCol, lightCol, lightCol],
-            uv : [],
-            type : ShapeType.Sphere,
-            enableBorder : false,
-            count : 6
-        }
+        let vertexType = CreateVertexAttributeType(ShapeType.Sphere, false);
+        vertexType.position = [VectorToArray(botLeft), VectorToArray(topLeft), VectorToArray(botRight),
+                               VectorToArray(botRight), VectorToArray(topLeft), VectorToArray(topRight)];
+
+        vertexType.vertexColor = [ ColorWheelConfig.BlackColor , ColorWheelConfig.WhiteColor, ColorWheelConfig.BlackColor, 
+                                    ColorWheelConfig.BlackColor, ColorWheelConfig.WhiteColor, ColorWheelConfig.WhiteColor];
+        vertexType.count = 6;
 
         vertexType.uv = vertexType.position;
         
@@ -152,7 +160,8 @@ class ColorWheelProcessor {
 
         let valueBar = this.GetValueBarRect();
         let screenY = (Lerp(valueBar.botLeft.y, valueBar.topLeft.y, value));
-        this.dotProcessor.AddDot(CustomIDString.ColorValueBarDot, valueBar.center.x, screenY, DotConfig.DefaultColor);
+
+        this.dotProcessor.AddDot(CustomIDString.ColorValueBarDot, valueBar.center.x, screenY, valueBar.center.x, valueBar.center.y, ColorWheelConfig.DotControlColor);
     }
 //#endregion
 
@@ -206,7 +215,8 @@ private GetHSVByMousePos(x : number, y : number) : HSVType{
 private SetColorWheelByMousePos(x : number, y : number) {
     this.hsv = this.GetHSVByMousePos(x, y);
 
-    this.dotProcessor.AddDot(CustomIDString.DominateDot, x, y, DotConfig.DefaultColor);
+    this.dotProcessor.AddDot(CustomIDString.DominateDot, x, y, this.colorWheelType.x, this.colorWheelType.y, ColorWheelConfig.DotControlColor);
+
     this.dominateColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
 }
 
@@ -218,8 +228,10 @@ SetColorWheelByHSV(hsv : HSVType) {
     let x = ((Math.cos(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.x, 
         y = ((Math.sin(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.y ;
 
-    this._dotProcessor.AddDot(CustomIDString.DominateDot, x, y, 
-                            DotConfig.DefaultColor);
+    this._dotProcessor.AddDot(CustomIDString.DominateDot, x, y, this.colorWheelType.x, this.colorWheelType.y,
+                            ColorWheelConfig.DotControlColor);
+
+    this.dominateColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
 }
 //#endregion
 }

@@ -23,6 +23,16 @@ export function degree2radian(degree : number) {
     return degree * (Math.PI / 180);
 }
 
+function componentToHex(c : number) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+//From - https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+export function rgbToHex(r : number, g : number, b : number) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 //#region Collision Detection
 
 export function SphereCollide(sphereX : number, sphereY : number, radian : number, collider_x : number, colider_y : number) : boolean {

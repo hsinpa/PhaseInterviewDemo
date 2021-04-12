@@ -5,6 +5,7 @@ import {VectorToArray, VectorNumScale, ArrayToVector} from '../../Hsinpa/Utility
 import { IntVector2 } from '../../Hsinpa/UniversalType';
 import {TriangleCollide} from '../../Hsinpa/WebGL/WebglStatic';
 import {Dictionary} from 'typescript-collections';
+import {CreateVertexAttributeType} from './WheelProcessorHelper';
 
 class PolygonProcessor {
     private rawPolygons : PolygonType[];
@@ -32,11 +33,19 @@ class PolygonProcessor {
     //Process one per time
     Process() : VertexAttributeType {
         let polyType = this.rawPolygons[this.index];
+        this.index++;
 
-        let vertexType = this.GetVertexById(polyType.id);
-        vertexType.color.length = 0;//Reset color, because its dynamic
+        let cacheVertex = this.cachePolygonLookupTable.getValue(polyType.id);
         
-        let isCacheVertex = vertexType.position.length > 0;
+        if (cacheVertex != null) {
+            cacheVertex.mainColor = polyType.color;
+            return cacheVertex;
+        }
+
+        let enableBorder = this.selectPolygon != null && this.selectPolygon.id == polyType.id;
+
+        let vertexType = CreateVertexAttributeType(ShapeType.Polygon, enableBorder);
+        
         let polygonCount = polyType.points.length;
         
         for (let i = 0; i < polygonCount; i++) {
@@ -50,19 +59,15 @@ class PolygonProcessor {
 
             vertexPosition = this.colorWheel.ScreenPositionToClipSpace(vertexPosition.x, vertexPosition.y); //Clip space
 
-            if (!isCacheVertex)
-                vertexType.position.push(VectorToArray(vertexPosition));
+            vertexType.position.push(VectorToArray(vertexPosition));
 
-            vertexType.color.push(polyType.color);
+            vertexType.vertexColor.push(polyType.color);
 
-            if (!isCacheVertex)
-                vertexType.uv.push(VectorToArray(uv));
+            vertexType.uv.push(VectorToArray(uv));
         }
         
         vertexType.count = polygonCount;
-        
-        this.index++;
-        
+                
         return vertexType;
     }
 
@@ -79,27 +84,6 @@ class PolygonProcessor {
         let worldY = (rawLocalPos[1] * scale) + offset_y;
 
         return {x : worldX, y : worldY}
-    }
-
-    private GetVertexById(id : string) {
-        let cacheVertex = this.cachePolygonLookupTable.getValue(id);
-        
-        if (cacheVertex != null && cacheVertex != undefined) {
-            return cacheVertex;
-        }
-
-        let enableBorder = this.selectPolygon != null && this.selectPolygon.id == id;
-
-        let vertexType : VertexAttributeType = {
-            position : [],
-            color : [],
-            uv : [],
-            enableBorder : enableBorder,
-            type : ShapeType.Polygon,
-            count : 0
-        }
-
-        return vertexType;
     }
 
     //#region Input Event

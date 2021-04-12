@@ -27,10 +27,13 @@ export interface PolygonType {
 
 export interface VertexAttributeType {
     position : number[][]; // Vector2
-    color :  number[][]; // Vector4,
+    vertexColor :  number[][]; // Vector4,
     uv :  number[][]; // Vector2
     enableBorder : boolean,
     type : number, // ShapeType
+    mainColor : number[],
+    subColor : number[],
+    positionOffset : number[],
     count : number
 }
 
@@ -46,6 +49,7 @@ export let CustomEventTypes = {
     MouseUpEvent : "event@mouseUp",
     MouseCtrlClick : "event@clickclick",
     DeselectPolygonEvent : "event@polygonDeselect",
+    OnDominateColorEvent : "event@dominateColorChange",
 }
 
 export let CustomIDString = {
@@ -54,8 +58,10 @@ export let CustomIDString = {
     ColorValueBarDot : "id@dot_valuebar",
 }
 
-export let DotConfig = {
-    DefaultColor : [0.9,0.9,0.9, 1]
+export let ColorWheelConfig = {
+    DotControlColor : [0.9,0.9,0.9, 1],
+    WhiteColor : [1,1,1,1],
+    BlackColor : [0,0,0,1]
 }
 
 export let ShapeType = {

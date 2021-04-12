@@ -93,3 +93,8 @@ export function StringToVector(vectorString : string) : IntVector2 {
         y : parseFloat(splits[1])
     };
 }
+
+export function RoundToDecimal(value : number, decimal : number) {
+    let d = Math.pow(10, decimal);
+    return Math.round(value * d) / d;
+}

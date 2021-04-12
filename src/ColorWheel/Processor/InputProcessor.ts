@@ -4,9 +4,9 @@ import ColorWheel from '../ColorWheel';
 import ColorWheelProcessor from './ColorWheelProcessor';
 import PolygonProcessor from './PolygonProcessor';
 
-import {VectorToArray, VectorNumScale, ArrayToVector} from '../../Hsinpa/UtilityMethod';
+import {VectorToArray, VectorNumScale, ArrayToVector, RoundToDecimal} from '../../Hsinpa/UtilityMethod';
 import { IntVector2 } from '../../Hsinpa/UniversalType';
-import {rgb2hsv} from '../../Hsinpa/WebGL/WebglStatic';
+import {rgb2hsv, rgbToHex} from '../../Hsinpa/WebGL/WebglStatic';
 
 class InputProcessor {
 
@@ -24,6 +24,27 @@ class InputProcessor {
         this._webglCanvas.addEventListener(CustomEventTypes.MouseDownEvent, this.OnMouseClick.bind(this));
         this._webglCanvas.addEventListener(CustomEventTypes.MouseDragEvent, this.OnMouseDrag.bind(this));
         this._webglCanvas.addEventListener(CustomEventTypes.DeselectPolygonEvent, this.OnPolygonDeselect.bind(this));
+
+        this._webglCanvas.addEventListener(CustomEventTypes.OnDominateColorEvent, this.OnDominateColorChange.bind(this));
+        
+        this.SetDominateColorInfo(this._colorWheelProcessor.dominateColor);
+    }
+
+    private OnDominateColorChange(e : CustomEvent) {
+        this.SetDominateColorInfo(e.detail);
+    }
+
+    private SetDominateColorInfo(color : number[]) {
+        let colorInfoDomQuery = ".control_panel .color_info";
+        let dom : HTMLBodyElement = document.querySelector(colorInfoDomQuery);
+        
+        let scaledR = Math.ceil(color[0]*255), scaleG = Math.ceil(color[1]*255), scaleB = Math.ceil(color[3]*255), scaleA = Math.ceil(color[3]*255);
+        let coloInfoTemplate = `
+        RGBA: rgb(${RoundToDecimal(color[0],2 )}, ${RoundToDecimal(color[1],2)},${RoundToDecimal(color[2],2)},${RoundToDecimal(color[3],2)})</br>
+        RGBA: rgb(${scaledR}, ${scaleG},${scaleB}, ${scaleA})</br>
+        HEX: ${rgbToHex(scaledR, scaleG, scaleB)}`;
+        
+        dom.innerHTML = coloInfoTemplate;
     }
 
     private SynchorizeColors(color : number[]) {
@@ -50,6 +71,7 @@ class InputProcessor {
 
         let isColorWheelActive = this._colorWheelProcessor.CheckAndExecuteColorWheelCollision(mouse);
 
+        //Color Wheel Mouse Event
         if (isColorWheelActive) {
 
             this.SynchorizeColors(this._colorWheelProcessor.dominateColor);
@@ -58,6 +80,7 @@ class InputProcessor {
             return;
         }
 
+        //Value Bar Mouse Event
         let isValueBarActive = this._colorWheelProcessor.CheckAndExecuteValueBarCollision(mouse);
         if (isValueBarActive) {
             this.SynchorizeColors(this._colorWheelProcessor.dominateColor);
@@ -77,11 +100,9 @@ class InputProcessor {
                 this._polygonProcessor.selectPolygon.color[2]);
 
             this._colorWheelProcessor.SetColorWheelByHSV(
-                { radian : hsv[0],saturation : hsv[1], value: hsv[2]
+                { radian : hsv[0], saturation : hsv[1], value: hsv[2]
              });
-             
-            console.log(hsv);
-                
+                            
             this._mainApp.DrawREGLCavnas();
             return;
         }

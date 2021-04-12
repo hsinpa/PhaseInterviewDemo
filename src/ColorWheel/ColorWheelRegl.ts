@@ -3,9 +3,13 @@ import {VertexAttributeType} from './ColorWheelTypes';
 
 export interface CustomReglPropType {
     time : number;
-    vertex : number[][];
-    color : number[][];
-    uv : number[][];
+    vertex : number[][],
+    color : number[][], // Vertex Color
+    uv : number[][],
+
+    mainColor : number[],
+    subColor : number[],
+    positionOffset : number[], //Vector2
     vertexCount : number,
     enableBorder : number,
     shapeType : number,
@@ -17,13 +21,16 @@ export function ExecuteREGLCommand(regl : Regl, drawCommand : REGL.DrawCommand, 
     // console.log("vertexAttrType.color " + vertexAttrType.color.length);
     // console.log("vertexAttrType.uv " + vertexAttrType.uv.length);
     // console.log("vertexAttrType.count " + vertexAttrType.count);
-
+    
     drawCommand({
         vertex : regl.buffer(vertexAttrType.position),
-        color : regl.buffer(vertexAttrType.color),
+        color : regl.buffer(vertexAttrType.vertexColor),
         uv : regl.buffer(vertexAttrType.uv),
         enableBorder : (vertexAttrType.enableBorder) ? 1 : 0,
         shapeType : vertexAttrType.type,
+        mainColor : vertexAttrType.mainColor,
+        subColor : vertexAttrType.subColor,
+        positionOffset : vertexAttrType.positionOffset,
         vertexCount : vertexAttrType.count
     });
 }
@@ -56,8 +63,12 @@ export function CreateREGLCommandObj(regl : Regl, vertex : string, fragment : st
 
         uniforms: {
             time: regl.prop<CustomReglPropType, "time">("time"),
+            u_offset : regl.prop<CustomReglPropType, "positionOffset">("positionOffset"),
+
             u_enableBorder: regl.prop<CustomReglPropType, "enableBorder">("enableBorder"),
             u_shapeType: regl.prop<CustomReglPropType, "shapeType">("shapeType"),
+            u_mainColor: regl.prop<CustomReglPropType, "mainColor">("mainColor"),
+            u_subColor: regl.prop<CustomReglPropType, "subColor">("subColor"),
         },
 
         count: regl.prop<CustomReglPropType, "vertexCount">("vertexCount")

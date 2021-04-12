@@ -23,13 +23,9 @@ class WheelProcessorHelper {
                                         scaleX : x, 
                                         scaleY : y }
         
-        //Quick reset, hope to save performance by reusing array
-        
-        let isCacheVertex = vertexType.position.length > 0;
-
-         vertexType.position.length = 0
-         vertexType.color.length = 0
-        //vertexType.uv.length = 0
+        vertexType.position.length = 0
+        vertexType.vertexColor.length = 0
+        vertexType.uv.length = 0
         vertexType.count = 0;
 
         for (let i = 0; i < steps; i++) {
@@ -45,11 +41,8 @@ class WheelProcessorHelper {
             }
 
             vertexType.position = vertexType.position.concat(this.GetVertexArray(t1, t3, t2));
-            
-            if (!isCacheVertex)
-                vertexType.uv = vertexType.uv.concat(this.GetUVArray(t1, t3, t2));
-            
-            vertexType.color = vertexType.color.concat(GetColorArrayFunc(t1, t3, t2));
+            vertexType.uv = vertexType.uv.concat(this.GetUVArray(t1, t3, t2));
+            vertexType.vertexColor = vertexType.vertexColor.concat(GetColorArrayFunc(t1, t3, t2));
         }
         vertexType.count = vertexType.position.length;
 
@@ -79,6 +72,27 @@ class WheelProcessorHelper {
         return [[t1.x, t1.y], [t2.x, t2.y], [t3.x, t3.y]];
     }
 
+}
+
+export function CreateVertexAttributeType(type : number, enableBorder : boolean) : VertexAttributeType {
+
+    let newVertex : VertexAttributeType = {
+        position : [],
+        vertexColor : [],
+        uv : [],
+        enableBorder : enableBorder,
+        type : type,
+
+        //Default white color
+        mainColor : [1,1,1,1],
+        subColor : [1,1,1,1],
+
+        //Default no offset
+        positionOffset : [0,0],
+        count : 0
+    }
+
+    return newVertex;
 }
 
 export default WheelProcessorHelper;  
