@@ -10,6 +10,7 @@ import InputProcessor from './Processor/InputProcessor';
 
 import CanvasInputHandler from './InputHandler/CanvasInputHandler';
 
+import EventSystem from '../Hsinpa/EventSystem';
 
 class ColorWheel extends WebGLCanvas{
     webglUtility : WebglUtility;
@@ -20,16 +21,18 @@ class ColorWheel extends WebGLCanvas{
     colorWheelProcessor : ColorWheelProcessor;
     inputProcessor : InputProcessor;
     inputHandler : CanvasInputHandler;
+    eventSystem : EventSystem;
 
     constructor( config: ColorWheelConfig) {
         super(config.canvas_query, config.canvas_width, config.canvas_height);
         this.webglUtility = new WebglUtility();
+        this.eventSystem = new EventSystem();
         
-        this.polygonProcessor = new PolygonProcessor(this, this._webglDom, config.polygons);
-        this.colorWheelProcessor = new ColorWheelProcessor(this, this._webglDom,  config.colorWheel,4.0); 
+        this.polygonProcessor = new PolygonProcessor(this, config.polygons);
+        this.colorWheelProcessor = new ColorWheelProcessor(this,  config.colorWheel,4.0); 
         this.inputProcessor = new InputProcessor(this, this._webglDom, this.polygonProcessor, this.colorWheelProcessor); 
         
-        this.inputHandler = new CanvasInputHandler(this._webglDom);
+        this.inputHandler = new CanvasInputHandler(this._webglDom, this.eventSystem);
 
         this.InitProcess(config.vertex_path, config.frag_path);
     }

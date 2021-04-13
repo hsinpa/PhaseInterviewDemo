@@ -14,7 +14,6 @@ class PolygonProcessor {
     private index : number = 0;
     private count : number = 0;
     private colorWheel : ColorWheel;
-    private webglCanvas: HTMLCanvasElement;
 
     private _selectedPolygon : PolygonType;
 
@@ -22,9 +21,8 @@ class PolygonProcessor {
         return this._selectedPolygon;
     }
 
-    constructor(colorWheel : ColorWheel, webglCanvas: HTMLCanvasElement, polygons : PolygonType[]) {
+    constructor(colorWheel : ColorWheel, polygons : PolygonType[]) {
         this.colorWheel = colorWheel;
-        this.webglCanvas = webglCanvas;
         this.rawPolygons = polygons;
         this.count = this.rawPolygons.length;
         this.cachePolygonLookupTable = new Dictionary<string, VertexAttributeType>();
@@ -107,7 +105,8 @@ class PolygonProcessor {
 
         this._selectedPolygon = null;
 
-        this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.DeselectPolygonEvent,  { detail: deselected_id }));
+        this.colorWheel.eventSystem.Notify(CustomEventTypes.DeselectPolygonEvent, deselected_id);
+        //this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.DeselectPolygonEvent,  { detail: deselected_id }));
     }
 
     public SelectPolygon(polygon : PolygonType) {
@@ -118,9 +117,13 @@ class PolygonProcessor {
         let index = this.rawPolygons.findIndex(x=>x.id == poly_id);
 
         if (index < 0) return;
+        let vertexType = this.FindPolygonVertexByID(poly_id);
 
         this.rawPolygons[index].color = color;
-        this.rawPolygons[index].gradientColor = supportColor;
+
+        //Only change polygon's support color, if its enable
+        if (vertexType.enableLinearGradient || vertexType.enableRadialGradient)
+            this.rawPolygons[index].gradientColor = supportColor;
     }
 
     public CheckAndExecutePolygonCollision(mouse : IntVector2) : boolean {

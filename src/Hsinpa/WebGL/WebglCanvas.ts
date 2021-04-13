@@ -72,11 +72,6 @@ abstract class WebglCanvas {
             data: new Uint8Array(4)
         })).map(x=> x / 255);
     }
-
-    // public SetCanvasToSceenSize(canvas : HTMLCanvasElement) {
-    //     canvas.width = window.innerWidth;
-    //     canvas.height = window.innerHeight;
-    // }
 }
 
 export default WebglCanvas;

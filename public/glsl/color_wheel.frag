@@ -57,7 +57,7 @@
 
         if (stripX < 0.01 || stripY < 0.01) {
           vec4 stripColor = (vec4(1.0,1.0,1.0,1.0)- v_color) * 0.4;
-          returnColor = vec4(stripColor.r, stripColor.g, stripColor.b, 1.0);
+          returnColor = vec4(stripColor.r, stripColor.g, stripColor.b, 0.5);
         }
       }
     }

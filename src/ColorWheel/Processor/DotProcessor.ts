@@ -1,10 +1,8 @@
-import {ColorWheelType} from '../ColorWheelTypes';
 import {VertexAttributeType} from '../ColorWheelTypes';
-import {SphereCollide, hsv2rgb} from '../../Hsinpa/WebGL/WebglStatic';
+import {SphereCollide} from '../../Hsinpa/WebGL/WebglStatic';
 import ColorWheel from '../ColorWheel';
-import {VectorToArray, VectorMinus} from '../../Hsinpa/UtilityMethod';
-import { IntVector2 } from '../../Hsinpa/UniversalType';
-import { CustomEventTypes, ShapeType, ColorWheelConfig } from '../ColorWheelTypes';
+import {VectorMinus} from '../../Hsinpa/UtilityMethod';
+import {ShapeType, ColorWheelConfig } from '../ColorWheelTypes';
 import WheelProcessorHelper, {CreateVertexAttributeType} from './WheelProcessorHelper';
 import {PiePieceType} from './ColorWheelProcessor';
 
@@ -25,7 +23,9 @@ class DotProcessor {
     
     public radius : number;
 
-    private _dotArray : DotType[]; 
+    private _dotArray : DotType[];
+    private _vertexCache : VertexAttributeType[];
+
     private _wheelProcessorHelper : WheelProcessorHelper;
     private _sphereSteps = 6; // dot is small, so keep this number small
     private _mainApp : ColorWheel;
@@ -33,6 +33,7 @@ class DotProcessor {
     constructor(mainApp : ColorWheel, wheelProcessorHelper : WheelProcessorHelper ) {
         this._mainApp = mainApp;
         this._dotArray = [];
+        this._vertexCache = [];
         this._wheelProcessorHelper = wheelProcessorHelper;
     }
 
@@ -56,6 +57,7 @@ class DotProcessor {
             newDotType.vertex.positionOffset = [offsetClipSpace.x, offsetClipSpace.y];
 
             this._dotArray.push(newDotType);
+            this._vertexCache.push(newDotType.vertex);
         }
     }
 
@@ -63,6 +65,7 @@ class DotProcessor {
         let idIndex = this._dotArray.findIndex(x=>x._id == id);
         if (idIndex >= 0) {
             this._dotArray.splice(idIndex, 1);
+            this._vertexCache.splice(idIndex, 1);
         }
     }
 
@@ -83,11 +86,12 @@ class DotProcessor {
             updatedDot.vertex.mainColor = color;
 
             this._dotArray[idIndex] = updatedDot;
+            this._vertexCache[idIndex] = updatedDot.vertex;
         }
     }
 
     Process() : VertexAttributeType[]{
-        return this._dotArray.map(x=>x.vertex);
+        return this._vertexCache;
     }
 
     private GetDotColors(t1 : PiePieceType, t2 : PiePieceType, t3 : PiePieceType) : number[][] {

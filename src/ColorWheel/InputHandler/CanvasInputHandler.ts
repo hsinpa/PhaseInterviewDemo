@@ -1,6 +1,6 @@
 import { IntVector2 } from '../../Hsinpa/UniversalType';
-import { VectorDistance } from '../../Hsinpa/UtilityMethod';
 import { CustomEventTypes } from '../ColorWheelTypes';
+import EventSystem from '../../Hsinpa/EventSystem';
 
 export enum InputState {
     MouseDown, MouseDrag, MouseUp
@@ -15,8 +15,11 @@ class InputHandler {
     private _delayEvent : number = 10; // 1000 = 1s
     private _lastEventTime : number = 0;
 
-    constructor(webglCanvas: HTMLCanvasElement) {
+    private eventSystem : EventSystem;
+
+    constructor(webglCanvas: HTMLCanvasElement, eventSystem : EventSystem) {
         this._webglCanvas = webglCanvas;
+        this.eventSystem = eventSystem;
     
         this._webglCanvas.addEventListener('mousedown', this.OnMouseDown.bind(this));
         this._webglCanvas.addEventListener('mouseup', this.OnMouseUp.bind(this));
@@ -27,7 +30,7 @@ class InputHandler {
         this._startMousePosition = this.GetMousePosVector(e);
         this._isMouseDown = true;
 
-        this._webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.MouseDownEvent,  { detail: this._startMousePosition }))
+        this.eventSystem.Notify(CustomEventTypes.MouseDownEvent, {mousePosition : this._startMousePosition});
     }
 
     private OnMouseMove(e : MouseEvent) {
@@ -38,14 +41,15 @@ class InputHandler {
 
         let mousePos = this.GetMousePosVector(e);
 
-        this._webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.MouseDragEvent,  { detail: mousePos }))
+        this.eventSystem.Notify(CustomEventTypes.MouseDragEvent, {mousePosition : mousePos});
 
         this._lastEventTime = e.timeStamp + this._delayEvent;
     }
 
     private OnMouseUp(e : MouseEvent) {
         this._isMouseDown = false;
-        this._webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.MouseUpEvent,  { detail: this.GetMousePosVector(e) }))
+        
+        this.eventSystem.Notify(CustomEventTypes.MouseUpEvent, {mousePosition : this.GetMousePosVector(e)});
     }
 
     private GetMousePosVector(e : MouseEvent) {

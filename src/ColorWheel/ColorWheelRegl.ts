@@ -18,12 +18,7 @@ export interface CustomReglPropType {
     scale : number
 }
 
-export function ExecuteREGLCommand(regl : Regl, drawCommand : REGL.DrawCommand, vertexAttrType : VertexAttributeType) {
-    // console.log("vertexAttrType.position " + vertexAttrType.position.length);
-    // console.log("vertexAttrType.color " + vertexAttrType.color.length);
-    // console.log("vertexAttrType.uv " + vertexAttrType.uv.length);
-    // console.log("vertexAttrType.count " + vertexAttrType.count);
-    
+export function ExecuteREGLCommand(regl : Regl, drawCommand : REGL.DrawCommand, vertexAttrType : VertexAttributeType) {    
     drawCommand({
         vertex : (vertexAttrType.position),
         color : (vertexAttrType.vertexColor),

@@ -21,11 +21,11 @@ class InputProcessor {
         this._polygonProcessor = polygonProcessor;
         this._colorWheelProcessor = colorWheelProcessor;
     
-        this._webglCanvas.addEventListener(CustomEventTypes.MouseDownEvent, this.OnMouseClick.bind(this));
-        this._webglCanvas.addEventListener(CustomEventTypes.MouseDragEvent, this.OnMouseDrag.bind(this));
 
-        this._webglCanvas.addEventListener(CustomEventTypes.DeselectPolygonEvent, this.OnPolygonDeselect.bind(this));
-        this._webglCanvas.addEventListener(CustomEventTypes.OnColorEvent, this.OnWheelColorChange.bind(this));
+        this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.MouseDownEvent, this.OnMouseClick.bind(this));
+        this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.MouseDragEvent, this.OnMouseDrag.bind(this));
+        this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.DeselectPolygonEvent, this.OnPolygonDeselect.bind(this));
+        this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.OnColorEvent, this.OnWheelColorChange.bind(this));
         
         this.SetWheelColorInfo(CustomIDString.DominateColorTitle, this._colorWheelProcessor.dominateColor);
         this.RegisterGradientCheckboxEvent();
@@ -63,12 +63,12 @@ class InputProcessor {
             this._mainApp.DrawREGLCavnas();
     }
 
-    private OnWheelColorChange(e : CustomEvent) {
-        this.SetWheelColorInfo(e.detail.title, e.detail.color);
+    private OnWheelColorChange(e : any) {
+        this.SetWheelColorInfo(e.title, e.color);
     }
 
     private SetWheelColorInfo(colorTitle : string, color : number[]) {
-        let colorInfoDomQuery = ".control_panel .color_info";
+        let colorInfoDomQuery = ".control_panel .color_panel";
         let dom : HTMLBodyElement = document.querySelector(colorInfoDomQuery);
         
         let scaledR = Math.ceil(color[0]*255), scaleG = Math.ceil(color[1]*255), scaleB = Math.ceil(color[3]*255), scaleA = Math.ceil(color[3]*255);
@@ -101,17 +101,17 @@ class InputProcessor {
         }
     }
 
-    private OnMouseClick(e : CustomEvent) {
-        let mouse : IntVector2 = e.detail;
+    private OnMouseClick(e : any) {
+        let mouse : IntVector2 = e.mousePosition;
         this.OnMouseEvent(mouse, InputState.MouseDown);
     }
     
-    private OnMouseDrag(e : CustomEvent) {
-        let mouse : IntVector2 = e.detail;
+    private OnMouseDrag(e : any) {
+        let mouse : IntVector2 = e.mousePosition;
         this.OnMouseEvent(mouse, InputState.MouseDrag);
     }
 
-    private OnPolygonDeselect(e : CustomEvent) {
+    private OnPolygonDeselect(e : any) {
         this.ShowGradientHTMLTable(false);
 
         this._colorWheelProcessor.SetColorWheelByRGB(CustomIDString.DominateDot, this._colorWheelProcessor.dominateColor);

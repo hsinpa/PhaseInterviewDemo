@@ -1,7 +1,4 @@
 import { IntVector2 } from '../../Hsinpa/UniversalType';
-import { VectorMinus } from '../../Hsinpa/UtilityMethod';
-
-
 export function hsv2rgb(hue : number, saturate : number, value : number) {
     hue = radian2degree(hue);
 

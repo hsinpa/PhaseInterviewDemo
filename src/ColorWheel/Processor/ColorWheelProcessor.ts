@@ -31,8 +31,6 @@ class ColorWheelProcessor {
     private cWheelHelper : WheelProcessorHelper;
     private _dotProcessor : DotProcessor;
 
-    private webglCanvas: HTMLCanvasElement;
-
     private radian_offset : number;
     private hsv : HSVType;
 
@@ -56,10 +54,13 @@ class ColorWheelProcessor {
     public set wheelDisplayColor(color : number[]) {
         if (this._mode == ColorWheelMode.Normal) {
             this._dominateColor = color;
-            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnColorEvent,  { detail: {title : CustomIDString.DominateColorTitle, color : this._dominateColor }}))
+            this.colorWheel.eventSystem.Notify(CustomEventTypes.OnColorEvent, {title : CustomIDString.DominateColorTitle, color : this._dominateColor });
+            //this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnColorEvent,  { detail: {title : CustomIDString.DominateColorTitle, color : this._dominateColor }}))
         } else if (this._mode == ColorWheelMode.Gradient) {
             this._supportColor = color;
-            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnColorEvent,  { detail: {title : CustomIDString.GraidentColorTitle, color : this._supportColor }}))
+            this.colorWheel.eventSystem.Notify(CustomEventTypes.OnColorEvent, {title : CustomIDString.GraidentColorTitle, color : this._supportColor });
+
+            //this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnColorEvent,  { detail: {title : CustomIDString.GraidentColorTitle, color : this._supportColor }}))
         }
     }
 
@@ -79,7 +80,7 @@ class ColorWheelProcessor {
         return this._mode;
     }
 
-    constructor(colorWheel : ColorWheel, webglCanvas: HTMLCanvasElement, colorWheelType : ColorWheelType, radian_offset : number) {
+    constructor(colorWheel : ColorWheel, colorWheelType : ColorWheelType, radian_offset : number) {
         this._mode = ColorWheelMode.Normal;
 
         this.cWheelHelper = new WheelProcessorHelper(colorWheel);
@@ -87,7 +88,6 @@ class ColorWheelProcessor {
         this.colorWheelType = colorWheelType;
         this.colorWheel = colorWheel;
         this.radian_offset = radian_offset;
-        this.webglCanvas = webglCanvas;
 
         this.wheelDisplayColor =  [1,1,1,1];
         this.hsv = {radian : 1, saturation : 0, value : 1 }

@@ -9,8 +9,16 @@ body {
 .control_panel {
     position: relative;
     margin-left: 1rem;
-
+    
+    .panels {
+        display: flex;
+        width: 500px;
+    }
+    .color_panel {
+        flex: 1; /* additionally, equal width */
+    }
     .gradient_panel {
+        flex: 1; /* additionally, equal width */
         display: none;
     }
     // position: absolute;
