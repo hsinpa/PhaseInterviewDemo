@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Color wheel picker</title>
+<link rel="stylesheet" href="./dist/index.css"></head>
+<body>
+
+    <canvas id="webgl_canvas" width="512" height="512"></canvas>
+    
+    <div class="control_panel">
+        <h3>Color Wheel Control Panel</h3>
+
+        <div class="panels">
+            <section class="color_panel">
+                RGBA: rgb(1,1,1,1)<br>
+                RGBA: rgb(255,255,255,255)<br>
+                HEX : #FFFFFFF
+            </section>
+    
+            <section class="gradient_panel">
+                <h4>Gradient</h4>
+                <label>Linear Gradient</label>
+                <input type="checkbox" class="linear_gradient" name="linear_gradient" value="1">
+                <br>
+                <label>Radial Gradient</label>
+                <input type="checkbox" class="radial_gradient" name="radial_gradient" value="1">    
+            </section>
+        </div>
+    </div>
+
+    <script type="module" src="./dist/index.js"></script>
+
+</body></html>

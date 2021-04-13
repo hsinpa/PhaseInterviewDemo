@@ -1,0 +1,67 @@
+{
+    "canvas_query" : "#webgl_canvas",
+    "vertex_path" : "./glsl/simple_webgl.vert",
+    "frag_path" : "./glsl/color_wheel.frag",
+    "canvas_height" : 600,
+    "canvas_width" : 850,
+    "colorWheel" : {
+        "x" : 150,
+        "y" : 450,
+        "radius" : 100,
+
+        "dominateDotSize" : 6,
+        "gradientDotSize" : 5
+    },
+
+    "polygons" : [
+        {
+        "id" : "box_01",
+        "color" : [1, 0, 0,1],
+        "x" : 550,
+        "y" : 350,
+        "scale" :70,
+        "ignoreRaycast" : false,
+        "points" : [[-1, -1], [-1, 1], [1, -1],
+                    [1, -1], [-1, 1], [1, 1]]   
+    },
+
+    {
+        "id" : "triangle_01",
+        "color" : [1, 0.3, 0.3, 1],
+        "x" : 520,
+        "y" : 500,
+        "scale" : 60,
+        "ignoreRaycast" : false,
+        "points" : [[-0.8, -0.8], [-0.8, 1], [1.5, -0.5]]
+    },
+    {
+        "id" : "triangle_02",
+        "color" : [0, 1, 1,1],
+        "x" : 420,
+        "y" : 320,
+        "scale" : 65,
+        "ignoreRaycast" : false,
+        "points" : [[-0.5,-0.4], [0.7, 0.6], [1, -0.2]]
+    },
+    {
+        "id" : "rectangle_01",
+        "color" : [0, 0.5, 1,1],
+        "x" : 390,
+        "y" : 420,
+        "scale" : 70,
+        "ignoreRaycast" : false,
+        "points" : [[-1, -0.6], [-1, 0.6], [1, -0.6],
+                    [1, -0.6], [-1, 0.6], [1, 0.6]]
+    },
+    {
+        "id" : "background",
+        "color" : [1,1,1,1],
+        "x" : 300,
+        "y" : 300,
+        "scale" : 1000,
+        "ignoreRaycast" : true,
+        "points" : [[-1, -1], [-1, 1], [1, -1],
+                    [1, -1], [-1, 1], [1, 1]]   
+    }
+]
+}
