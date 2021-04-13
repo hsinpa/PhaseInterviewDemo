@@ -21,13 +21,12 @@ class InputProcessor {
         this._polygonProcessor = polygonProcessor;
         this._colorWheelProcessor = colorWheelProcessor;
     
-
         this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.MouseDownEvent, this.OnMouseClick.bind(this));
         this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.MouseDragEvent, this.OnMouseDrag.bind(this));
         this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.DeselectPolygonEvent, this.OnPolygonDeselect.bind(this));
         this._mainApp.eventSystem.ListenToEvent(CustomEventTypes.OnColorEvent, this.OnWheelColorChange.bind(this));
         
-        this.SetWheelColorInfo(CustomIDString.DominateColorTitle, this._colorWheelProcessor.dominateColor);
+        this.SetWheelColorHTMLInfo(CustomIDString.DominateColorTitle, this._colorWheelProcessor.dominateColor);
         this.RegisterGradientCheckboxEvent();
     }
 
@@ -36,7 +35,6 @@ class InputProcessor {
         let radialGradientDomQuery : HTMLInputElement = document.querySelector(".control_panel .radial_gradient");
         radialGradientDomQuery.addEventListener("change",this.OnGradientCheckboxEvent.bind(this) );
         linearGradientDomQuery.addEventListener("change",this.OnGradientCheckboxEvent.bind(this) );
-
     }
 
     private OnGradientCheckboxEvent(e: any) {
@@ -57,48 +55,14 @@ class InputProcessor {
         if (!polyVertexType.enableRadialGradient && !polyVertexType.enableLinearGradient)
             this._colorWheelProcessor.dotProcessor.RemoveDot(CustomIDString.GradientDot);
 
-        this.SetPolygonColorInfo(polyVertexType);
+        this.SetPolygonDataToColorWheel(polyVertexType);
 
         if (hasNewChange)
             this._mainApp.DrawREGLCavnas();
     }
 
     private OnWheelColorChange(e : any) {
-        this.SetWheelColorInfo(e.title, e.color);
-    }
-
-    private SetWheelColorInfo(colorTitle : string, color : number[]) {
-        let colorInfoDomQuery = ".control_panel .color_panel";
-        let dom : HTMLBodyElement = document.querySelector(colorInfoDomQuery);
-        
-        let scaledR = Math.ceil(color[0]*255), scaleG = Math.ceil(color[1]*255), scaleB = Math.ceil(color[3]*255), scaleA = Math.ceil(color[3]*255);
-        let coloInfoTemplate = `
-        <h4>${colorTitle}</h4>
-        <p>
-        RGBA: rgb(${RoundToDecimal(color[0],2 )}, ${RoundToDecimal(color[1],2)},${RoundToDecimal(color[2],2)},${RoundToDecimal(color[3],2)})</br>
-        RGBA: rgb(${scaledR}, ${scaleG},${scaleB}, ${scaleA})</br>
-        HEX: ${rgbToHex(scaledR, scaleG, scaleB)}</p>`;
-        
-        dom.innerHTML = coloInfoTemplate;
-    }
-
-    private ShowGradientHTMLTable(isShow : boolean, linearGradient : boolean = false, radialGradient : boolean = false) {
-        let gradientHolderDomQuery : HTMLBodyElement = document.querySelector(".control_panel .gradient_panel");
-        let linearGradientDomQuery : HTMLInputElement = document.querySelector(".control_panel .linear_gradient");
-        let radialGradientDomQuery : HTMLInputElement = document.querySelector(".control_panel .radial_gradient");
-
-        gradientHolderDomQuery.style.display = (isShow) ? "inline" : "none";
-
-        if (isShow) {
-            linearGradientDomQuery.checked = linearGradient;
-            radialGradientDomQuery.checked = radialGradient;
-        }
-    }
-
-    private SynchorizeColors(color : number[], supportColor : number[]) {
-        if (this._polygonProcessor.selectPolygon != null) {
-            this._polygonProcessor.ChangePolygonColor(this._polygonProcessor.selectPolygon.id, color, supportColor);
-        }
+        this.SetWheelColorHTMLInfo(e.title, e.color);
     }
 
     private OnMouseClick(e : any) {
@@ -131,12 +95,11 @@ class InputProcessor {
             return;
         }
 
-        //Support Dot
+        //Support / Gradient Dot Collide detection
         let isSupportDotActive = this._colorWheelProcessor.dotProcessor.CheckDotCollision(CustomIDString.GradientDot, mouse.x, mouse.y);
         if (isSupportDotActive && inputState == InputState.MouseDown) {
             this._colorWheelProcessor.SetMode(ColorWheelMode.Gradient);
             this._colorWheelProcessor.SetColorWheelByMousePos(CustomIDString.GradientDot, mouse.x, mouse.y);
-            //console.log("Click on support dot");
             this._mainApp.DrawREGLCavnas();
             return;
         }
@@ -156,14 +119,14 @@ class InputProcessor {
             return;
         }
 
-        //Only handle click event later on
+        //Only handle "mouse down" event later on
         if (inputState == InputState.MouseDrag) return;
 
         let isPolygonActive = this._polygonProcessor.CheckAndExecutePolygonCollision(mouse);
         if (isPolygonActive) {
             let polyVertexType = this._polygonProcessor.FindPolygonVertexByID(this._polygonProcessor.selectPolygon.id);
 
-            this.SetPolygonColorInfo(polyVertexType);
+            this.SetPolygonDataToColorWheel(polyVertexType);
         
             this.ShowGradientHTMLTable(true, polyVertexType.enableLinearGradient, polyVertexType.enableRadialGradient);
             this._mainApp.DrawREGLCavnas();
@@ -171,7 +134,7 @@ class InputProcessor {
         }
     }
 
-    SetPolygonColorInfo(polyVertexType : VertexAttributeType) {
+    SetPolygonDataToColorWheel(polyVertexType : VertexAttributeType) {
         let isGradientEnable = polyVertexType.enableLinearGradient || polyVertexType.enableRadialGradient;
 
         if (isGradientEnable) {
@@ -195,6 +158,40 @@ class InputProcessor {
         this._colorWheelProcessor.SetColorWheelByHSV(CustomIDString.DominateDot,
             { radian : hsv[0], saturation : hsv[1], value: hsv[2]
          });
+    }
+    private SetWheelColorHTMLInfo(colorTitle : string, color : number[]) {
+        let colorInfoDomQuery = ".control_panel .color_panel";
+        let dom : HTMLBodyElement = document.querySelector(colorInfoDomQuery);
+        
+        let scaledR = Math.ceil(color[0]*255), scaleG = Math.ceil(color[1]*255), scaleB = Math.ceil(color[3]*255), scaleA = Math.ceil(color[3]*255);
+        let coloInfoTemplate = `
+        <h4>${colorTitle}</h4>
+        <p>
+        RGBA: rgba(${RoundToDecimal(color[0],2 )}, ${RoundToDecimal(color[1],2)},${RoundToDecimal(color[2],2)},${RoundToDecimal(color[3],2)})</br>
+        RGBA: rgba(${scaledR}, ${scaleG},${scaleB}, ${scaleA})</br>
+        HEX: ${rgbToHex(scaledR, scaleG, scaleB)}</p>`;
+        
+        dom.innerHTML = coloInfoTemplate;
+    }
+
+    private ShowGradientHTMLTable(isShow : boolean, linearGradient : boolean = false, radialGradient : boolean = false) {
+        let gradientHolderDomQuery : HTMLBodyElement = document.querySelector(".control_panel .gradient_panel");
+        let linearGradientDomQuery : HTMLInputElement = document.querySelector(".control_panel .linear_gradient");
+        let radialGradientDomQuery : HTMLInputElement = document.querySelector(".control_panel .radial_gradient");
+
+        gradientHolderDomQuery.style.display = (isShow) ? "inline" : "none";
+
+        if (isShow) {
+            linearGradientDomQuery.checked = linearGradient;
+            radialGradientDomQuery.checked = radialGradient;
+        }
+    }
+
+    //Apply color wheel data to selected polygon
+    private SynchorizeColors(color : number[], supportColor : number[]) {
+        if (this._polygonProcessor.selectPolygon != null) {
+            this._polygonProcessor.ChangePolygonColor(this._polygonProcessor.selectPolygon.id, color, supportColor);
+        }
     }
 }
 

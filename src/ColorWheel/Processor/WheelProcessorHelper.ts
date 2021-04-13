@@ -1,8 +1,8 @@
 import ColorWheel from '../ColorWheel';
-import {PiePieceType} from './ColorWheelProcessor';
-import {VertexAttributeType} from '../ColorWheelTypes';
-import {VectorToArray, VectorNumScale} from '../../Hsinpa/UtilityMethod';
-import {SphereCollide, hsv2rgb} from '../../Hsinpa/WebGL/WebglStatic';
+import {PiePieceType, ColorPickBarPointsType} from './ColorWheelProcessor';
+import {VertexAttributeType, ShapeType, ColorWheelConfig} from '../ColorWheelTypes';
+import {VectorToArray} from '../../Hsinpa/UtilityMethod';
+import { IntVector2 } from '../../Hsinpa/UniversalType';
 
 type CustomGetWheelColor = (t1 : PiePieceType, t2 : PiePieceType, t3 : PiePieceType) => number[][];
 
@@ -70,6 +70,25 @@ class WheelProcessorHelper {
 
     private GetUVArray(t1 : PiePieceType, t2 : PiePieceType, t3 : PiePieceType) : number[][] {
         return [[t1.x, t1.y], [t2.x, t2.y], [t3.x, t3.y]];
+    }
+
+    public GetValueBarVertex(colorPickBarPointsType : ColorPickBarPointsType) {
+        let topLeft : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(colorPickBarPointsType.topLeft.x, colorPickBarPointsType.topLeft.y);
+        let topRight : IntVector2 =this.colorWheel.ScreenPositionToClipSpace(colorPickBarPointsType.topRight.x, colorPickBarPointsType.topRight.y);
+        let botLeft : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(colorPickBarPointsType.botLeft.x, colorPickBarPointsType.botLeft.y);
+        let botRight : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(colorPickBarPointsType.botRight.x, colorPickBarPointsType.botRight.y);
+
+        let vertexType = CreateVertexAttributeType(ShapeType.Sphere, false);
+        vertexType.position = [VectorToArray(botLeft), VectorToArray(topLeft), VectorToArray(botRight),
+                               VectorToArray(botRight), VectorToArray(topLeft), VectorToArray(topRight)];
+
+        vertexType.vertexColor = [ ColorWheelConfig.BlackColor , ColorWheelConfig.WhiteColor, ColorWheelConfig.BlackColor, 
+                                    ColorWheelConfig.BlackColor, ColorWheelConfig.WhiteColor, ColorWheelConfig.WhiteColor];
+        vertexType.count = 6;
+
+        vertexType.uv = vertexType.position;
+
+        return vertexType;
     }
 
 }

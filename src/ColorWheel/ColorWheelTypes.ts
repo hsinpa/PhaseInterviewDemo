@@ -12,7 +12,9 @@ export interface ColorWheelConfig {
 export interface ColorWheelType {
     x : number;
     y : number;
-    radius : number
+    radius : number;
+    dominateDotSize : number;
+    gradientDotSize : number;
 }
 
 export interface PolygonType {
@@ -72,9 +74,6 @@ export let ColorWheelConfig = {
 
     WhiteColor : [1,1,1,1],
     BlackColor : [0,0,0,1],
-
-    MainDotSize : 6,
-    SupportDotSize : 5,
 }
 
 export let ShapeType = {

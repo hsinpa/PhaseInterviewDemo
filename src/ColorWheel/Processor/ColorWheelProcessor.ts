@@ -16,7 +16,7 @@ export interface PiePieceType {
     scaleY : number;
 }
 
-interface ColorPickBarPointsType {
+export interface ColorPickBarPointsType {
     topLeft : IntVector2,
     topRight : IntVector2,
     botLeft : IntVector2,
@@ -92,7 +92,6 @@ class ColorWheelProcessor {
         this.wheelDisplayColor =  [1,1,1,1];
         this.hsv = {radian : 1, saturation : 0, value : 1 }
         this.SetColorWheelByHSV(this.ActiveDotID,  this.hsv);
-        //this.SetColorWheelByHSV(CustomIDString.GradientDot,  this.hsv);
     }
 
 //#region Color Wheel
@@ -150,28 +149,14 @@ class ColorWheelProcessor {
         if (this.cacheColorBarVertex != null) {
 
             this.cacheColorBarVertex.mainColor = lightCol;
-            //this.cacheColorBarVertex.vertexColor =  [blackCol, lightCol, blackCol, blackCol, lightCol, lightCol];
 
             return this.cacheColorBarVertex;
         }
 
         //Cache the screen position information
         this.cacheColorBarPoints = this.GetValueBarRect();
-
-        let topLeft : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(this.cacheColorBarPoints.topLeft.x, this.cacheColorBarPoints.topLeft.y);
-        let topRight : IntVector2 =this.colorWheel.ScreenPositionToClipSpace(this.cacheColorBarPoints.topRight.x, this.cacheColorBarPoints.topRight.y);
-        let botLeft : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(this.cacheColorBarPoints.botLeft.x, this.cacheColorBarPoints.botLeft.y);
-        let botRight : IntVector2 = this.colorWheel.ScreenPositionToClipSpace(this.cacheColorBarPoints.botRight.x, this.cacheColorBarPoints.botRight.y);
-
-        let vertexType = CreateVertexAttributeType(ShapeType.Sphere, false);
-        vertexType.position = [VectorToArray(botLeft), VectorToArray(topLeft), VectorToArray(botRight),
-                               VectorToArray(botRight), VectorToArray(topLeft), VectorToArray(topRight)];
-
-        vertexType.vertexColor = [ ColorWheelConfig.BlackColor , ColorWheelConfig.WhiteColor, ColorWheelConfig.BlackColor, 
-                                    ColorWheelConfig.BlackColor, ColorWheelConfig.WhiteColor, ColorWheelConfig.WhiteColor];
-        vertexType.count = 6;
-
-        vertexType.uv = vertexType.position;
+        
+        let vertexType = this.cWheelHelper.GetValueBarVertex(this.cacheColorBarPoints);
         
         this.cacheColorBarVertex = vertexType;
 
@@ -185,7 +170,7 @@ class ColorWheelProcessor {
         let screenY = (Lerp(valueBar.botLeft.y, valueBar.topLeft.y, value));
 
         this.dotProcessor.AddDot(CustomIDString.ColorValueBarDot, valueBar.center.x, screenY, valueBar.center.x, valueBar.center.y, 
-                                ColorWheelConfig.DotControlColor, ColorWheelConfig.MainDotSize);
+                                ColorWheelConfig.DotControlColor, this.colorWheelType.dominateDotSize);
     }
 //#endregion
 
@@ -213,6 +198,49 @@ public CheckAndExecuteValueBarCollision(mouse : IntVector2) : boolean {
     return false;
 }
 
+//Assume is within color wheel
+SetColorWheelByMousePos(dotID : string, x : number, y : number) {
+    let hsvArray = rgb2hsv(this.wheelDisplayColor[0],this.wheelDisplayColor[1], this.wheelDisplayColor[2]);
+    this.hsv.value = hsvArray[2];//Only need to change value
+    this.hsv = this.GetHSVByMousePos(x, y);
+
+    let dotColor = dotID == CustomIDString.DominateDot ? ColorWheelConfig.DotControlColor : ColorWheelConfig.SubDotControlColor;
+    let dotSize = dotID == CustomIDString.DominateDot ? this.colorWheelType.dominateDotSize : this.colorWheelType.gradientDotSize;
+
+    this.dotProcessor.AddDot(dotID, x, y, this.colorWheelType.x, this.colorWheelType.y, dotColor, dotSize);
+
+    this.wheelDisplayColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
+
+    this.SetValueBarNumber(this.hsv.value);
+}
+//#endregion
+
+//#region Other Utillity functions
+SetMode(mode : ColorWheelMode) {
+    this._mode = mode;
+}
+
+SetColorWheelByHSV(dotID : string, hsv : HSVType) {
+    this.hsv = hsv;
+    
+    this.SetValueBarNumber(this.hsv.value);
+
+    let dotColor = dotID == CustomIDString.DominateDot ? ColorWheelConfig.DotControlColor : ColorWheelConfig.SubDotControlColor;
+    let dotSize = dotID == CustomIDString.DominateDot ? this.colorWheelType.dominateDotSize : this.colorWheelType.gradientDotSize;
+
+    let x = ((Math.cos(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.x, 
+        y = ((Math.sin(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.y ;
+
+    this._dotProcessor.AddDot(dotID, x, y, this.colorWheelType.x, this.colorWheelType.y, dotColor, dotSize);
+
+    this.wheelDisplayColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
+}
+
+SetColorWheelByRGB(dotID : string, rgb : number[]) {
+    let hsvArray = rgb2hsv(rgb[0],rgb[1], rgb[2]);
+    this.SetColorWheelByHSV(dotID, {radian : hsvArray[0], saturation : hsvArray[1], value : hsvArray[2] } );
+}
+
 private GetHSVByMousePos(x : number, y : number) : HSVType{
     let mouseVector : IntVector2 = {x : x , y : y};
     let wheelVector : IntVector2 = {x : this.colorWheelType.x  , y : this.colorWheelType.y};
@@ -230,48 +258,8 @@ private GetHSVByMousePos(x : number, y : number) : HSVType{
         value : this.hsv.value // Leave it unchange
     }
 }
-
-//Assume is within color wheel
-SetColorWheelByMousePos(dotID : string, x : number, y : number) {
-    let hsvArray = rgb2hsv(this.wheelDisplayColor[0],this.wheelDisplayColor[1], this.wheelDisplayColor[2]);
-    this.hsv.value = hsvArray[2];//Only need to change value
-    this.hsv = this.GetHSVByMousePos(x, y);
-
-    let dotColor = dotID == CustomIDString.DominateDot ? ColorWheelConfig.DotControlColor : ColorWheelConfig.SubDotControlColor;
-    let dotSize = dotID == CustomIDString.DominateDot ? ColorWheelConfig.MainDotSize : ColorWheelConfig.SupportDotSize;
-
-    this.dotProcessor.AddDot(dotID, x, y, this.colorWheelType.x, this.colorWheelType.y, dotColor, dotSize);
-
-    this.wheelDisplayColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
-
-    this.SetValueBarNumber(this.hsv.value);
-}
-
-SetColorWheelByHSV(dotID : string, hsv : HSVType) {
-    this.hsv = hsv;
-    
-    this.SetValueBarNumber(this.hsv.value);
-
-    let dotColor = dotID == CustomIDString.DominateDot ? ColorWheelConfig.DotControlColor : ColorWheelConfig.SubDotControlColor;
-    let dotSize = dotID == CustomIDString.DominateDot ? ColorWheelConfig.MainDotSize : ColorWheelConfig.SupportDotSize;
-
-    let x = ((Math.cos(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.x, 
-        y = ((Math.sin(this.GetNormalizedRadian(this.hsv.radian))) * this.colorWheelType.radius * this.hsv.saturation) + this.colorWheelType.y ;
-
-    this._dotProcessor.AddDot(dotID, x, y, this.colorWheelType.x, this.colorWheelType.y, dotColor, dotSize);
-
-    this.wheelDisplayColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
-}
-
-SetColorWheelByRGB(dotID : string, rgb : number[]) {
-    let hsvArray = rgb2hsv(rgb[0],rgb[1], rgb[2]);
-    this.SetColorWheelByHSV(dotID, {radian : hsvArray[0], saturation : hsvArray[1], value : hsvArray[2] } );
-}
-
-SetMode(mode : ColorWheelMode) {
-    this._mode = mode;
-}
 //#endregion
+
 }
 
 export default ColorWheelProcessor;
