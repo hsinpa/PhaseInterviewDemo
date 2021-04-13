@@ -56,10 +56,10 @@ class ColorWheelProcessor {
     public set wheelDisplayColor(color : number[]) {
         if (this._mode == ColorWheelMode.Normal) {
             this._dominateColor = color;
-            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnDominateColorEvent,  { detail: this._dominateColor }))
+            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnColorEvent,  { detail: {title : CustomIDString.DominateColorTitle, color : this._dominateColor }}))
         } else if (this._mode == ColorWheelMode.Gradient) {
             this._supportColor = color;
-            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnSupportColorEvent,  { detail: this._supportColor }))
+            this.webglCanvas.dispatchEvent(new CustomEvent(CustomEventTypes.OnColorEvent,  { detail: {title : CustomIDString.GraidentColorTitle, color : this._supportColor }}))
         }
     }
 
@@ -261,6 +261,11 @@ SetColorWheelByHSV(dotID : string, hsv : HSVType) {
     this._dotProcessor.AddDot(dotID, x, y, this.colorWheelType.x, this.colorWheelType.y, dotColor, dotSize);
 
     this.wheelDisplayColor = hsv2rgb(this.hsv.radian, this.hsv.saturation, this.hsv.value);
+}
+
+SetColorWheelByRGB(dotID : string, rgb : number[]) {
+    let hsvArray = rgb2hsv(rgb[0],rgb[1], rgb[2]);
+    this.SetColorWheelByHSV(dotID, {radian : hsvArray[0], saturation : hsvArray[1], value : hsvArray[2] } );
 }
 
 SetMode(mode : ColorWheelMode) {

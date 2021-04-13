@@ -54,14 +54,16 @@ export let CustomEventTypes = {
     MouseUpEvent : "event@mouseUp",
     MouseCtrlClick : "event@clickclick",
     DeselectPolygonEvent : "event@polygonDeselect",
-    OnDominateColorEvent : "event@dominateColorChange",
-    OnSupportColorEvent : "event@supportColorChange",
+    OnColorEvent : "event@onColorChange"
 }
 
 export let CustomIDString = {
     DominateDot : "id@dot_dominate",
     GradientDot : "id@dot_gradient",
     ColorValueBarDot : "id@dot_valuebar",
+
+    DominateColorTitle : "Dominate Color Info",
+    GraidentColorTitle : "Gradient Color Info",
 }
 
 export let ColorWheelConfig = {

@@ -25,20 +25,20 @@
     {
         "id" : "triangle_01",
         "color" : [1, 0.3, 0.3, 1],
-        "x" : 480,
+        "x" : 520,
         "y" : 500,
-        "scale" : 50,
-        "ignoreRaycast" : false,
-        "points" : [[-1, -1], [-1, 1], [1, -0.5]]
-    },
-    {
-        "id" : "fake_sphere",
-        "color" : [0, 0, 1,1],
-        "x" : 430,
-        "y" : 320,
         "scale" : 60,
         "ignoreRaycast" : false,
-        "points" : [[0,0], [0.30901699437494745, 0.9510565162951535], [1, 0]]
+        "points" : [[-0.8, -0.8], [-0.8, 1], [1.5, -0.5]]
+    },
+    {
+        "id" : "triangle_02",
+        "color" : [0, 1, 1,1],
+        "x" : 420,
+        "y" : 320,
+        "scale" : 65,
+        "ignoreRaycast" : false,
+        "points" : [[-0.5,-0.4], [0.7, 0.6], [1, -0.2]]
     },
     {
         "id" : "rectangle_01",
